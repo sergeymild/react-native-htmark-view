@@ -11,7 +11,7 @@ import {
 import React, { memo, useRef } from 'react';
 
 const LINKING_ERROR =
-  `The package 'react-native-html-view' doesn't seem to be linked. Make sure: \n\n` +
+  `The package 'react-native-htmark-view' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
@@ -29,33 +29,26 @@ type MarkdownParams = {
   markdown: string;
 } & CommonParams;
 
-type HtmlViewProps = {
+type HtMarkViewProps = {
   params: HtmlParams | MarkdownParams;
   onLinkPress?: (link: string) => void;
   onPress?: () => void;
   style?: ViewStyle;
 };
 
-const ComponentName = 'HtmlView';
+const ComponentName = 'HtMarkView';
 
-const _HtmlView =
+const _HtMarkView =
   UIManager.getViewManagerConfig(ComponentName) != null
-    ? requireNativeComponent<HtmlViewProps>(ComponentName)
+    ? requireNativeComponent<HtMarkViewProps>(ComponentName)
     : () => {
         throw new Error(LINKING_ERROR);
       };
 
-const _MarkdownView =
-  UIManager.getViewManagerConfig('MarkdownView') != null
-    ? requireNativeComponent<HtmlViewProps>('MarkdownView')
-    : () => {
-        throw new Error(LINKING_ERROR);
-      };
-
-export const HtmlView: React.FC<HtmlViewProps> = memo((props) => {
+export const HtMarkView: React.FC<HtMarkViewProps> = memo((props) => {
   const htmlRef = useRef<any>(null);
   if (!props.onLinkPress && !props.onPress) {
-    return <_HtmlView {...props} />;
+    return <_HtMarkView {...props} />;
   }
   return (
     <TouchableOpacity
@@ -72,32 +65,7 @@ export const HtmlView: React.FC<HtmlViewProps> = memo((props) => {
       }}
     >
       {/*@ts-ignore*/}
-      <_HtmlView {...props} ref={htmlRef} />
-    </TouchableOpacity>
-  );
-});
-
-export const MarkdownView: React.FC<HtmlViewProps> = memo((props) => {
-  const htmlRef = useRef<any>(null);
-  if (!props.onLinkPress && !props.onPress) {
-    return <_MarkdownView {...props} />;
-  }
-  return (
-    <TouchableOpacity
-      onPress={async (e) => {
-        const tag = findNodeHandle(htmlRef.current);
-        if (!tag) return;
-        const link = await NativeModules.MarkdownView.findLink(
-          tag,
-          e.nativeEvent.locationX,
-          e.nativeEvent.locationY
-        );
-        if (link) props.onLinkPress?.(link);
-        else props.onPress?.();
-      }}
-    >
-      {/*@ts-ignore*/}
-      <_MarkdownView {...props} ref={htmlRef} />
+      <_HtMarkView {...props} ref={htmlRef} />
     </TouchableOpacity>
   );
 });

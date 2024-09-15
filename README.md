@@ -1,18 +1,18 @@
-# react-native-html-view
+# react-native-htmark-view
 
 R
 
 ## Installation
 
 ```sh
-npm install react-native-html-view
+npm install react-native-htmark-view
 ```
 
 ## Usage
 
 
 ```js
-import { HtmlViewView } from "react-native-html-view";
+import { HtmlViewView } from "react-native-htmark-view";
 
 // ...
 

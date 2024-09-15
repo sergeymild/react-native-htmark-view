@@ -1,5 +1,5 @@
 {
-  "name": "react-native-html-view",
+  "name": "react-native-htmark-view",
   "version": "0.1.0",
   "description": "R",
   "main": "src/index",
@@ -39,14 +39,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sergeymild/react-native-html-view.git"
+    "url": "git+https://github.com/sergeymild/react-native-htmark-view.git"
   },
   "author": "Sergei Golishnikov <sergeymild@yandex.ru> (https://github.com/sergeymild)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/sergeymild/react-native-html-view/issues"
+    "url": "https://github.com/sergeymild/react-native-htmark-view/issues"
   },
-  "homepage": "https://github.com/sergeymild/react-native-html-view#readme",
+  "homepage": "https://github.com/sergeymild/react-native-htmark-view#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

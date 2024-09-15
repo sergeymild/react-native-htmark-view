@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { HtmlView, MarkdownView } from 'react-native-html-view';
+import { HtMarkView } from 'react-native-htmark-view';
 import { useState } from 'react';
 
 //<span style="font-size:20px;margin:0!important;padding:0!important;">This is a <strong>test</strong> <span style="color: yellow;">string</span> with <i><b><span style="font-size: 14px; color: green;">HTML</span></b></i></span>
@@ -19,15 +19,14 @@ export default function App() {
           console.log('🍓[App.parent]');
         }}
       >
-        <HtmlView
+        <HtMarkView
           params={{ html: html, maxLines, ellipsize: 'tail' }}
-          style={{ backgroundColor: 'yellow' }}
           // onPress={() => console.log('🍓[App.press]')}
           onLinkPress={(params) => {
             console.log('🍓[App.]', params);
           }}
         />
-        <HtmlView
+        <HtMarkView
           params={{ markdown: mark, maxLines, ellipsize: 'tail' }}
           // onPress={() => console.log('🍓[App.press]')}
           onLinkPress={(params) => {
