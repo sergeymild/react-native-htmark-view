@@ -1,6 +1,6 @@
 buildscript {
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["HtmlView_kotlinVersion"]
+  def kotlin_version = rootProject.ext.has("kotlinVersion") ? rootProject.ext.get("kotlinVersion") : project.properties["HtMarkView_kotlinVersion"]
 
   repositories {
     google()
@@ -31,11 +31,11 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["HtmlView_" + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties["HtMarkView_" + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["HtmlView_" + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties["HtMarkView_" + name]).toInteger()
 }
 
 def supportsNamespace() {
@@ -49,7 +49,7 @@ def supportsNamespace() {
 
 android {
   if (supportsNamespace()) {
-    namespace "com.htmlview"
+    namespace "com.htmark"
 
     sourceSets {
       main {
@@ -95,8 +95,9 @@ dependencies {
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
-  implementation 'org.commonmark:commonmark:+'
-  implementation('org.ccil.cowan.tagsoup:tagsoup:1.0.1')
+  implementation 'org.commonmark:commonmark:0.22.0'
+  implementation 'androidx.core:core-ktx:1.13.1'
+  implementation('org.ccil.cowan.tagsoup:tagsoup:1.2.1')
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 

@@ -1,19 +1,16 @@
-package com.htmlview
+package com.htmark
 
 import android.content.Context
-import android.graphics.Color
 import android.text.SpannedString
 import android.text.TextUtils
-import android.text.style.ClickableSpan
 import android.text.style.URLSpan
-import android.util.Log
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.getSpans
 import com.facebook.react.bridge.Promise
 import com.facebook.react.uimanager.PixelUtil
 
 
-class HtmlView(context: Context) : AppCompatTextView(context) {
+class HtMarkView(context: Context) : AppCompatTextView(context) {
 //  val textView = AppCompatTextView(context)
   val textView
   get() = this

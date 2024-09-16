@@ -1,4 +1,4 @@
-package com.htmlview
+package com.htmark
 
 import android.os.Handler
 import android.os.Looper
@@ -9,18 +9,18 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.uimanager.UIManagerHelper
 
-@ReactModule(name = HtmlViewModule.TAG)
-class HtmlViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+@ReactModule(name = HtMarkViewModule.TAG)
+class HtMarkViewModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   companion object {
-    const val TAG = "HtmlView"
+    const val TAG = "HtMarkView"
   }
 
   override fun getName(): String {
     return TAG
   }
 
-  private fun findView(viewId: Int): HtmlView? {
-    val view = if (reactApplicationContext != null) UIManagerHelper.getUIManager(reactApplicationContext, viewId)?.resolveView(viewId) as HtmlView? else null
+  private fun findView(viewId: Int): HtMarkView? {
+    val view = if (reactApplicationContext != null) UIManagerHelper.getUIManager(reactApplicationContext, viewId)?.resolveView(viewId) as HtMarkView? else null
     return view
   }
 
