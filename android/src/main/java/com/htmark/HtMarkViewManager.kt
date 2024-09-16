@@ -35,7 +35,6 @@ fun toTruncate(params: ReadableMap): TruncateAt? {
   }
 }
 
-private const val HTML_TEXT = "<span style=\"color:red;\">first first first<b>first</b>first <a href=\"https://google.com\">link</a> firstfirstfirstfirstfirstfirstfirstfirstfirst12345678firstfirstfirstfirstfirstfirstfirstfirstbefore<span style=\"color: green;\">first</span>after12345678</span>"
 private const val FLAGS = HtmlCompat.FROM_HTML_MODE_LEGACY or
   HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST or
   HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
