@@ -53,9 +53,10 @@ export const HtMarkView: React.FC<HtMarkViewProps> = memo((props) => {
   return (
     <TouchableOpacity
       onPress={async (e) => {
+        console.log('🍓[Index.]', )
         const tag = findNodeHandle(htmlRef.current);
         if (!tag) return;
-        const link = await NativeModules.HtmlView.findLink(
+        const link = await NativeModules.HtMarkView.findLink(
           tag,
           e.nativeEvent.locationX,
           e.nativeEvent.locationY

@@ -1,13 +1,11 @@
 package com.htmark
 
 import android.text.Spannable
-import android.text.SpannableString
 import android.text.TextUtils.TruncateAt
 import android.view.View.MeasureSpec
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.text.HtmlCompat
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
@@ -35,13 +33,9 @@ fun toTruncate(params: ReadableMap): TruncateAt? {
   }
 }
 
-private const val FLAGS = HtmlCompat.FROM_HTML_MODE_LEGACY or
-  HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST or
-  HtmlCompat.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
-
 fun getSpannableFromHtml(htmlString: String): Spannable {
   println("🗡️getSpannableFromHtml $htmlString")
-  return SpannableString(Html.fromHtml(htmlString, FLAGS))
+  return HtmlParser().parse(HtMarkViewViewManager.context!!.get()!!, htmlString)
 }
 
 fun getSpannableFromMarkdown(markdownString: String): Spannable {
