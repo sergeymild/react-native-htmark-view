@@ -2,11 +2,19 @@ import React
 import CoreText
 import UIKit
 
+struct TextLayoutParams {
+    let width: CGFloat
+    let height: CGFloat
+    let linesCount: Int
+}
+
+// MARK: attributedString
 func attributedString(markdown: String) -> NSAttributedString? {
     let html = MarkdownParser().html(from: markdown)
     return attributedString(html: html)
 }
 
+// MARK: attributedString
 func attributedString(
     html: String
 ) -> NSAttributedString? {
@@ -17,9 +25,12 @@ func attributedString(
             padding: 0 !important;
         }
         p { display: inline-block; }
+        div { display: inline-block; }
         </style>
         \(html)
         """
+
+    debugPrint("🗡️", modifiedHTML)
 
     guard let data = modifiedHTML.data(using: .utf8) else { return nil }
 
@@ -39,11 +50,12 @@ func attributedString(
     }
 }
 
+// MARK: calculateBoundingRect
 func calculateBoundingRect(
     for attributedString: NSAttributedString,
     size: CGSize,
     maxLines: Int
-) -> CGSize {
+) -> TextLayoutParams {
     let framesetter = CTFramesetterCreateWithAttributedString(attributedString as CFAttributedString)
     let constrainedSize = size
     let textPath = CGPath(rect: CGRect(origin: .zero, size: constrainedSize), transform: nil)
@@ -65,37 +77,23 @@ func calculateBoundingRect(
         linesHeight += ascent + descent + leading
         textWidth = max(textWidth, lineWidth + leading)
     }
-
-    return .init(width: min(textWidth, size.width), height: min(linesHeight, size.height))
+    return TextLayoutParams(
+        width: min(textWidth, size.width),
+        height: min(linesHeight, size.height),
+        linesCount: lines.count
+    )
 }
 
+// MARK: calculateTextSize
 func calculateTextSize(
     for attributedString: NSAttributedString,
     in size: CGSize,
     maxLines: Int
-) -> CGSize {
+) -> TextLayoutParams {
     return calculateBoundingRect(for: attributedString, size: size, maxLines: maxLines)
-    // Create a UILabel for measuring text
-    let label = UILabel()
-    label.numberOfLines = maxLines
-    label.lineBreakMode = .byTruncatingTail
-    label.attributedText = attributedString
-    label.frame.size.width = size.width
-
-    // Ensure the label height is constrained to fit within the maximum number of lines
-    let maxHeight = label.font.lineHeight * CGFloat(maxLines)
-    label.frame.size.height = maxHeight
-
-    // Size the label's text to fit within the constraints
-    label.sizeToFit()
-
-    // Return the calculated bounding rect
-    var boundingRect = label.frame
-    boundingRect.size.height = min(boundingRect.size.height, maxHeight)
-
-    return boundingRect.size
 }
 
+// MARK: SimpleTextShadowView
 class SimpleTextShadowView: RCTShadowView {
     static let measure: YGMeasureFunc = { node, width, widthNode, height, heightNode in
         guard let context = YGNodeGetContext(node) else {
@@ -106,23 +104,35 @@ class SimpleTextShadowView: RCTShadowView {
         let text = instance._content
         let isMark = instance._isMark
         let maxLines = instance._maxLines
-
         let str = isMark ? attributedString(markdown: text) : attributedString(html: text)
         let size2 = calculateTextSize(
             for: str!,
             in: .init(
                 width: CGFloat(width),
-                height: CGFloat(height)),
+                height: height.isNaN ? CGFloat.greatestFiniteMagnitude : CGFloat(height)),
             maxLines: maxLines == -1 ? Int.max : maxLines
         )
-
+        instance.notifyLayoutCalculated(params: size2)
         return YGSize(width: Float(size2.width), height: Float(size2.height))
     }
 
+    let bridge: RCTBridge
+    @objc
+    var onSizeCalculated: RCTDirectEventBlock?
     @objc
     var _content: String = ""
     var _isMark = false
     var _maxLines: Int = Int.max
+    var layoutParams: TextLayoutParams?
+
+    func notifyLayoutCalculated(params: TextLayoutParams) {
+        onSizeCalculated?([
+            "params": [
+                "width": params.width,
+                "height": params.height,
+                "linesCount": params.linesCount
+            ]])
+    }
 
 
     @objc
@@ -148,7 +158,8 @@ class SimpleTextShadowView: RCTShadowView {
         return false
     }
 
-    override init() {
+    init(bridge: RCTBridge) {
+        self.bridge = bridge
         super.init()
         YGNodeSetMeasureFunc(self.yogaNode!, SimpleTextShadowView.measure)
         YGNodeSetContext(self.yogaNode!, Unmanaged.passRetained(self).toOpaque())
@@ -174,7 +185,7 @@ class HtMarkViewManager: RCTViewManager {
     }
 
     override func shadowView() -> RCTShadowView! {
-        return SimpleTextShadowView()
+        return SimpleTextShadowView(bridge: bridge)
     }
 
     private func getView(withTag tag: NSNumber) -> HtMarkView {
@@ -220,8 +231,9 @@ class HtMarkViewManager: RCTViewManager {
 }
 
 class HtMarkView : UILabel, UIGestureRecognizerDelegate {
-
+    let bridge: RCTBridge
     init(bridge: RCTBridge) {
+        self.bridge = bridge
         super.init(frame: .zero)
         numberOfLines = 0
     }

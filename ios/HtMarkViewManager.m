@@ -5,6 +5,8 @@
 RCT_EXPORT_VIEW_PROPERTY(params, NSDictionary)
 RCT_EXPORT_SHADOW_PROPERTY(params, NSDictionary)
 
+RCT_EXPORT_SHADOW_PROPERTY(onSizeCalculated, RCTDirectEventBlock)
+
 RCT_EXTERN_METHOD(findLink:(nonnull NSNumber *)node
                   locationX:(nonnull NSNumber *)locationX
                   locationY:(nonnull NSNumber *)locationY

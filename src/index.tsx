@@ -29,10 +29,13 @@ type MarkdownParams = {
   markdown: string;
 } & CommonParams;
 
+export type TextSizeCalculatedParams = {width: number; height: number; linesCount: number}
+
 type HtMarkViewProps = {
   params: HtmlParams | MarkdownParams;
   onLinkPress?: (link: string) => void;
   onPress?: () => void;
+  onSizeCalculated?: (e: {nativeEvent: {params: TextSizeCalculatedParams}}) => void
   style?: ViewStyle;
 };
 
@@ -42,8 +45,8 @@ const _HtMarkView =
   UIManager.getViewManagerConfig(ComponentName) != null
     ? requireNativeComponent<HtMarkViewProps>(ComponentName)
     : () => {
-        throw new Error(LINKING_ERROR);
-      };
+      throw new Error(LINKING_ERROR);
+    };
 
 export const HtMarkView: React.FC<HtMarkViewProps> = memo((props) => {
   const htmlRef = useRef<any>(null);
