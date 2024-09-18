@@ -6,13 +6,16 @@ import android.view.View.MeasureSpec
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.appcompat.widget.AppCompatTextView
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.LayoutShadowNode
+import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
+import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.facebook.yoga.YogaMeasureFunction
 import com.facebook.yoga.YogaMeasureMode
 import com.facebook.yoga.YogaMeasureOutput
@@ -21,6 +24,8 @@ import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import java.lang.ref.WeakReference
 
+
+data class TextLayoutParams(val width: Int, val height: Int, val linesCount: Int)
 
 fun toTruncate(params: ReadableMap): TruncateAt? {
   if (!params.hasKey("ellipsize")) return null
@@ -46,25 +51,41 @@ fun getSpannableFromMarkdown(markdownString: String): Spannable {
 }
 
 
+val wrapContent = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 fun calculateTextSize(
   spannable: Spannable,
   maxLines: Int,
   ellipsize: TruncateAt?,
   maxWidth: Float,
   maxHeight: Float
-): IntArray {
+): TextLayoutParams {
   val r = AppCompatTextView(HtMarkViewViewManager.context!!.get()!!)
   r.maxLines = maxLines
   r.isSingleLine = maxLines == 1
   r.ellipsize = ellipsize
   r.text = spannable
-  r.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+  r.layoutParams = wrapContent
   r.measure(
     MeasureSpec.makeMeasureSpec(maxWidth.toInt(), MeasureSpec.AT_MOST),
     MeasureSpec.makeMeasureSpec(maxHeight.toInt(), MeasureSpec.AT_MOST),
   )
 
-  return intArrayOf(r.measuredWidth, r.measuredHeight)
+  var measuredHeight = r.measuredHeight
+  val lineHeight = r.lineHeight
+  val totalLineHeight = lineHeight * maxLines
+
+  // Step 6: Adjust the measured height to respect maxLines
+  if (r.lineCount > maxLines) {
+    //measuredHeight = PixelUtil.toPixelFromDIP(totalLineHeight.toFloat()).toInt();
+  }
+
+  measuredHeight = measuredHeight.coerceAtMost(maxHeight.toInt());
+
+  return TextLayoutParams(
+    width = r.measuredWidth,
+    height = measuredHeight,
+    linesCount = r.lineCount
+  )
 }
 
 class SimpleShadowView: LayoutShadowNode(), YogaMeasureFunction {
@@ -76,6 +97,7 @@ class SimpleShadowView: LayoutShadowNode(), YogaMeasureFunction {
   private var text = ""
   private var maxLines = Int.MAX_VALUE
   private var isMark = false
+  private var shouldNotifyOnSizeChanged = false
   private var ellipsize: TruncateAt? = null
 
   @ReactProp(name = "params")
@@ -93,6 +115,11 @@ class SimpleShadowView: LayoutShadowNode(), YogaMeasureFunction {
     dirty()
   }
 
+  @ReactProp(name = "onSizeCalculated")
+  fun onSizeCalculated(shouldNotifyOnSizeChanged: Boolean) {
+    this.shouldNotifyOnSizeChanged = shouldNotifyOnSizeChanged
+  }
+
   override fun measure(
     node: YogaNode?,
     width: Float,
@@ -101,9 +128,19 @@ class SimpleShadowView: LayoutShadowNode(), YogaMeasureFunction {
     heightMode: YogaMeasureMode?
   ): Long {
 
-    val textSize = calculateTextSize(if (isMark) getSpannableFromMarkdown(text) else getSpannableFromHtml(text), maxLines, ellipsize, width, height)
+    val h = if (height.isNaN()) Float.MAX_VALUE else height
+    val textSize = calculateTextSize(if (isMark) getSpannableFromMarkdown(text) else getSpannableFromHtml(text), maxLines, ellipsize, width, h)
     println("🗡️ SimpleShadowView.measure ${textSize}")
-    return YogaMeasureOutput.make(textSize[0], textSize[1])
+    if (shouldNotifyOnSizeChanged) {
+      themedContext?.getJSModule(RCTEventEmitter::class.java)?.receiveEvent(reactTag, "onSizeCalculated", Arguments.createMap().also { map ->
+        map.putMap("params", Arguments.createMap().also {
+          it.putInt("width", textSize.width)
+          it.putInt("height", textSize.height)
+          it.putInt("linesCount", textSize.linesCount)
+        })
+      })
+    }
+    return YogaMeasureOutput.make(textSize.width, textSize.height)
   }
 }
 
@@ -146,6 +183,7 @@ class HtMarkViewViewManager : SimpleViewManager<HtMarkView>() {
   override fun getExportedCustomDirectEventTypeConstants(): Map<String, Any> {
     return MapBuilder.builder<String, Any>()
       .put("onPress", MapBuilder.of("registrationName", "onPress"))
+      .put("onSizeCalculated", MapBuilder.of("registrationName", "onSizeCalculated"))
       .build()
   }
 }
