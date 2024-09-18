@@ -11,7 +11,6 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.LayoutShadowNode
-import com.facebook.react.uimanager.PixelUtil
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
@@ -40,7 +39,7 @@ fun toTruncate(params: ReadableMap): TruncateAt? {
 
 fun getSpannableFromHtml(htmlString: String): Spannable {
   println("🗡️getSpannableFromHtml $htmlString")
-  return HtmlParser().parse(HtMarkViewViewManager.context!!.get()!!, htmlString)
+  return HtmlParser().parse(HtMarkViewViewManager.context!!.get()!!, "<div>${htmlString}</div>")
 }
 
 fun getSpannableFromMarkdown(markdownString: String): Spannable {
@@ -61,7 +60,7 @@ fun calculateTextSize(
 ): TextLayoutParams {
   val r = AppCompatTextView(HtMarkViewViewManager.context!!.get()!!)
   r.maxLines = maxLines
-  r.isSingleLine = maxLines == 1
+  //r.isSingleLine = maxLines == 1
   r.ellipsize = ellipsize
   r.text = spannable
   r.layoutParams = wrapContent
@@ -71,14 +70,6 @@ fun calculateTextSize(
   )
 
   var measuredHeight = r.measuredHeight
-  val lineHeight = r.lineHeight
-  val totalLineHeight = lineHeight * maxLines
-
-  // Step 6: Adjust the measured height to respect maxLines
-  if (r.lineCount > maxLines) {
-    //measuredHeight = PixelUtil.toPixelFromDIP(totalLineHeight.toFloat()).toInt();
-  }
-
   measuredHeight = measuredHeight.coerceAtMost(maxHeight.toInt());
 
   return TextLayoutParams(
@@ -164,7 +155,7 @@ class HtMarkViewViewManager : SimpleViewManager<HtMarkView>() {
       textView.setMarkdownText(params.getString("markdown")!!)
     }
     textView.textView.maxLines = if (params.hasKey("maxLines")) params.getInt("maxLines") else Int.MAX_VALUE
-    textView.textView.isSingleLine = textView.textView.maxLines == 1
+    //textView.textView.isSingleLine = textView.textView.maxLines == 1
     textView.textView.ellipsize = toTruncate(params)
   }
 

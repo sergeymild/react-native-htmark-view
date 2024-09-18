@@ -34,6 +34,7 @@ data class StyleProperties(
 )
 
 class HtmlParser {
+  private var shouldSkipFirstNewLine = true
   fun parse(
     context: Context,
     html: String,
@@ -59,6 +60,7 @@ class HtmlParser {
     parentStyle: StyleProperties,
     treatPxAsDp: Boolean
   ) {
+    println("traverseNodes ${node}")
     if (node == null) return
 
     for (child in node.childNodes()) {
@@ -123,12 +125,17 @@ class HtmlParser {
               newStyle.isUnderline = true
             }
 
-            "p", "br" -> {
+            "br" -> {
               builder.append("\n")
             }
+            "p" -> {
+              if (shouldSkipFirstNewLine) {
+                shouldSkipFirstNewLine = false
+              } else {
+                builder.append("\n")
+              }
+            }
           }
-
-          // Рекурсивно обрабатываем дочерние узлы с обновленным стилем
           traverseNodes(context, child, builder, newStyle, treatPxAsDp)
         }
       }

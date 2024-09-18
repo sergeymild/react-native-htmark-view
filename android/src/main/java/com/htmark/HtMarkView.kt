@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.SpannedString
 import android.text.TextUtils
 import android.text.style.URLSpan
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.text.getSpans
 import com.facebook.react.bridge.Promise
@@ -16,15 +17,15 @@ class HtMarkView(context: Context) : AppCompatTextView(context) {
   get() = this
 
   init {
-    textView.setEllipsize(TextUtils.TruncateAt.MARQUEE)
+
   }
 
   fun setSpannableText(html: String) {
-    text = getSpannableFromHtml(html)
+    setText(getSpannableFromHtml(html), BufferType.SPANNABLE)
   }
 
   fun setMarkdownText(mark: String) {
-    text = getSpannableFromMarkdown(mark)
+    setText(getSpannableFromMarkdown(mark), BufferType.SPANNABLE)
   }
 
   fun findLink(locationX: Double, locationY: Double, promise: Promise) {
