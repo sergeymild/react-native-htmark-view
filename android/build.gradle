@@ -89,14 +89,17 @@ repositories {
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
+def ktxVersion = getExtOrDefault("ktxVersion")
+def commonmark = getExtOrDefault("commonmark")
 
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
   implementation "com.facebook.react:react-native:+"
-  implementation 'org.commonmark:commonmark:0.22.0'
+  implementation "org.commonmark:commonmark:$commonmark"
   implementation('org.jsoup:jsoup:+')
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "androidx.core:core-ktx:$ktxVersion"
 }
 

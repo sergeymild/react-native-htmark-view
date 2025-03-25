@@ -25,7 +25,6 @@ func attributedString(
             padding: 0 !important;
         }
         p { display: inline-block; }
-        div { display: inline-block; }
         </style>
         \(html)
         """
